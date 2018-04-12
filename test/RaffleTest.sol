@@ -26,4 +26,12 @@ contract RaffleTest {
   function testFirstTicketSoldToCreator() public {
     Assert.equal(raffle.participants(0), this, "Should sell first ticket to creator");
   }
+
+  function testTicketPurchase() public {
+    uint qty = 2;
+    raffle.joinraffle.value(price*qty)(qty);
+    Assert.equal(raffle.participants(qty), this, "Should sell tickets");
+
+    Assert.isFalse(raffle.joinraffle.value(1)(qty), "Should fail for under payment");
+  }
 }
