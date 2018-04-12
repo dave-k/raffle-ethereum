@@ -34,4 +34,9 @@ contract RaffleTest {
 
     Assert.isFalse(raffle.joinraffle.value(1)(qty), "Should fail for under payment");
   }
+
+  function testCanSellMoreThanMaxTickets() public {
+    uint qty = maxTickets + 1;
+    Assert.isFalse(raffle.joinraffle.value(price*qty)(qty), "Should fail for over ticket limit");
+  }
 }
