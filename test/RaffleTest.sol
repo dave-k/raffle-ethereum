@@ -6,12 +6,20 @@ import "../contracts/Raffle.sol";
 
 
 contract RaffleTest {
+  Raffle raffle;
   uint public initialBalance = 10 ether;
   uint public maxTickets = 10;
   uint public price = 1;
 
+  function beforeEach() public {
+    raffle = new Raffle(maxTickets, price);
+  }
+
   function testSetMaxTicketsAndTicketPrice() public {
-    Raffle raffle = new Raffle(maxTickets, price);
     Assert.equal(raffle.maxTickets(), maxTickets, "Should set maximum tickets available");
+  }
+
+  function testSetCreatorDuringContractCreation() public {
+    Assert.equal(raffle.creator(), this, "Should set creator during contract creation");
   }
 }
