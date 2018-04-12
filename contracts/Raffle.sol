@@ -31,6 +31,10 @@ contract Raffle {
     for (uint i = 0; i < _qty; i++) {
       participants.push(msg.sender);
     }
+
+    if (participants.length == maxTickets) {
+      return draw();
+    }
   }
 
   // award prize
