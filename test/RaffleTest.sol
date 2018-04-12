@@ -39,4 +39,11 @@ contract RaffleTest {
     uint qty = maxTickets + 1;
     Assert.isFalse(raffle.joinraffle.value(price*qty)(qty), "Should fail for over ticket limit");
   }
+
+  function testIsPrizeAwarded() public {
+    uint qty = maxTickets - 1;
+    raffle.joinraffle.value(price * qty)(qty);
+    uint prize = maxTickets * price;
+    Assert.equal(raffle.winner().balance, prize, "Should award prize equal to the sum of all the tickets");
+  }
 }

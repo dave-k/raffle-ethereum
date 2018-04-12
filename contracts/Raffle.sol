@@ -8,6 +8,7 @@ contract Raffle {
   uint public price;
   address public creator;
   address[] public participants;
+  address public winner;
 
   function Raffle(uint _maxTickets, uint _price) public payable {
     maxTickets = _maxTickets;
@@ -16,7 +17,7 @@ contract Raffle {
     joinraffle(msg.value);
   }
 
-  // purchase ticket
+  // purchase tickets
   function joinraffle(uint _qty) public payable returns(bool) {
 
     if (msg.value < price * _qty) {
@@ -30,5 +31,16 @@ contract Raffle {
     for (uint i = 0; i < _qty; i++) {
       participants.push(msg.sender);
     }
+  }
+
+  // award prize
+  function draw() internal returns (bool) {
+
+    uint seed = block.number;
+    uint random = uint(keccak256(seed)) % participants.length;
+    winner = participants[random];
+    uint prize = maxTickets * price;
+    winner.transfer(prize);
+    return true;
   }
 }
