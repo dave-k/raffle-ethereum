@@ -12,7 +12,7 @@ contract RaffleTest {
   uint public price = 1;
 
   function beforeEach() public {
-    raffle = new Raffle(maxTickets, price);
+    raffle = (new Raffle).value(1*price)(maxTickets, price);
   }
 
   function testSetMaxTicketsAndTicketPrice() public {
@@ -21,5 +21,9 @@ contract RaffleTest {
 
   function testSetCreatorDuringContractCreation() public {
     Assert.equal(raffle.creator(), this, "Should set creator during contract creation");
+  }
+
+  function testFirstTicketSoldToCreator() public {
+    Assert.equal(raffle.participants(0), this, "Should sell first ticket to creator");
   }
 }
