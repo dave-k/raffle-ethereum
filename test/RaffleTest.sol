@@ -15,8 +15,12 @@ contract RaffleTest {
     raffle = (new Raffle).value(1*price)(maxTickets, price);
   }
 
-  function testSetMaxTicketsAndTicketPrice() public {
+  function testSetMaxTickets() public {
     Assert.equal(raffle.maxTickets(), maxTickets, "Should set maximum tickets available");
+  }
+
+  function testSetTicketPrice() public {
+    Assert.equal(raffle.price(), price, "Should set ticket price");
   }
 
   function testSetCreatorDuringContractCreation() public {

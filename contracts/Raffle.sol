@@ -14,7 +14,7 @@ contract Raffle {
     maxTickets = _maxTickets;
     price = _price;
     creator = msg.sender;
-    joinraffle(msg.value);
+    joinraffle(1);
   }
 
   // purchase tickets
@@ -35,6 +35,7 @@ contract Raffle {
     if (participants.length == maxTickets) {
       return draw();
     }
+    return true;
   }
 
   // award prize
