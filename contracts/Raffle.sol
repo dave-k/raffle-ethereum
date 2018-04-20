@@ -1,6 +1,13 @@
 // contracts/Raffle.sol
-pragma solidity ^0.4.17;
+pragma solidity ^0.4.22;
 
+/*
+  Requirements:
+    The creator sets the number of tickets and ticket price
+    The creator must purchase the first ticket on creation
+    Participants can buy as many tickets as are available
+    The prize is awarded to a random participant once all tickets are sold
+*/
 
 contract Raffle {
   
@@ -10,11 +17,19 @@ contract Raffle {
   address[] public participants;
   address public winner;
 
+  event JoinEvent(uint _length);
+  event DrawEvent(address _winner, uint _prize);
+
   function Raffle(uint _maxTickets, uint _price) public payable {
     maxTickets = _maxTickets;
     price = _price;
     creator = msg.sender;
-    joinraffle(1);
+    uint qty = 1;
+    joinraffle(qty);
+  }
+
+  // `fallback` function called when eth is sent to Payable contract
+  function () public payable {
   }
 
   // purchase tickets
@@ -32,6 +47,8 @@ contract Raffle {
       participants.push(msg.sender);
     }
 
+    emit JoinEvent (participants.length);
+    
     if (participants.length == maxTickets) {
       return draw();
     }
@@ -44,8 +61,9 @@ contract Raffle {
     uint seed = block.number;
     uint random = uint(keccak256(seed)) % participants.length;
     winner = participants[random];
-    uint prize = maxTickets * price;
-    winner.transfer(prize);
+    uint prize = address(this).balance; // maxTickets * price;
+    emit DrawEvent (address(winner), prize);
+    address(winner).transfer(prize);
     return true;
   }
 }
