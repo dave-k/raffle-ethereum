@@ -17,10 +17,12 @@ contract Raffle {
   address[] public participants;
   address public winner;
 
-  event JoinEvent(uint _length);
+  event JoinEvent(uint _length, uint _qty);
   event DrawEvent(address _winner, uint _prize);
+  event Paid(address _from, uint _value);
 
   function Raffle(uint _maxTickets, uint _price) public payable {
+    
     maxTickets = _maxTickets;
     price = _price;
     creator = msg.sender;
@@ -30,6 +32,7 @@ contract Raffle {
 
   // `fallback` function called when eth is sent to Payable contract
   function () public payable {
+    emit Paid(msg.sender, msg.value);
   }
 
   // purchase tickets
@@ -47,7 +50,7 @@ contract Raffle {
       participants.push(msg.sender);
     }
 
-    emit JoinEvent (participants.length);
+    emit JoinEvent (participants.length, _qty);
     
     if (participants.length == maxTickets) {
       return draw();
@@ -55,15 +58,15 @@ contract Raffle {
     return true;
   }
 
-  // award prize
+  // award prize when all tickets are sold
   function draw() internal returns (bool) {
 
     uint seed = block.number;
     uint random = uint(keccak256(seed)) % participants.length;
     winner = participants[random];
     uint prize = address(this).balance; // maxTickets * price;
-    emit DrawEvent (address(winner), prize);
     address(winner).transfer(prize);
+    emit DrawEvent (address(winner), prize);
     return true;
   }
 }

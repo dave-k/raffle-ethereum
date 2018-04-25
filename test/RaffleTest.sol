@@ -59,6 +59,9 @@ contract RaffleTest {
 
   function testPrizeAwarded() public {
     uint qty = maxTickets - 1;
+    Assert.equal(raffle.winner(), 0, "winner should be zero before prize is awarded");
+
     Assert.isTrue(raffle.joinraffle.value(price * qty)(qty), "Should award prize equal to the sum of all the tickets");
+    Assert.notEqual(raffle.winner(), 0, "winner should be zero before prize is awarded");
   }
 }

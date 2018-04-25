@@ -11,6 +11,19 @@ contract("Raffle", accounts => {
   beforeEach(async () => {
     let qty = 1;
     raffle = await Raffle.new(TICKETS, PRICE, { value: qty*PRICE });
+    events = raffle.allEvents();
+    events.watch((error, result) => {
+      if (error) {
+        events.stopWatching();
+        return console.log('Error');
+      }
+
+      console.log(`${result.event}: `);
+      for (key in result.args) {
+        console.log(`- ${key}: ${result.args[key]}`);
+      }
+    });
+    events.stopWatching();
   });
   
   it("sets the creator", async () => {
@@ -29,14 +42,14 @@ contract("Raffle", accounts => {
     assert.equal(await raffle.participants(0), firstAccount);
   });
 
-  it("sells a ticket", function() {
-    return Raffle.deployed().then(function(instance) {
-      let qty = 1;
-      return instance.joinraffle.call(qty,{value:qty*PRICE, from: secondAccount});
-    }).then(function(result) {
-      assert.equal(result, true, "should sell a ticket");
-    });
-  });
+  it("sells a ticket", () => Raffle.deployed().then((instance) => {
+      roi = instance;
+      let qty = 2;
+      return roi.joinraffle(qty, {value:qty*PRICE, from: secondAccount})      
+    })
+    .then(() => roi.participants(2))
+    .then(result => assert.equal(result, secondAccount, 'wrong participant'))
+  );
 
   it("checks for insufficent payment", function() {
     return Raffle.deployed().then(function(instance) {
@@ -56,8 +69,11 @@ contract("Raffle", accounts => {
     });
   });
 
-  it("awards the prize", async () => {
+  it("awards the prize when all the tickets are sold", async () => {  
     let qty = TICKETS-1;
-    assert.equal(await raffle.joinraffle.call(qty,{value:qty*PRICE, from: secondAccount}), true);
+
+    assert.equal(await raffle.winner(), 0, "winner should be zero before prize is awarded");
+    await raffle.joinraffle(qty,{value:qty*PRICE, from: secondAccount});
+    assert.notEqual(await raffle.winner(), 0, "should award the prize");
   });
 });
